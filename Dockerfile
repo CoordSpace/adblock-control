@@ -16,6 +16,6 @@ LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DA
 
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /go/bin/adblock-control /go/bin/adblock-control
-USER appuser
+USER app
 
 CMD ["/go/bin/adblock-control"]
