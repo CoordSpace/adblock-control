@@ -16,6 +16,8 @@ LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DA
 
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /go/bin/adblock-control /go/bin/adblock-control
+# Copy over all the templates and icons
+COPY --from=builder $GOPATH/src/adblock-control/assets/* /go/bin/adblock-control/assets
 USER app
 
 CMD ["/go/bin/adblock-control"]
