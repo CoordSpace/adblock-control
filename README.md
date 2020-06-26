@@ -1,10 +1,10 @@
 # Adblock Control
 
-A super-simple golang webapp for temporarily disabling a self-hosted instance of the [Pi-Hole](https://pi-hole.net/) adblocker.
+A simple golang webapp for temporarily disabling a self-hosted instance of the [Pi-Hole](https://pi-hole.net/) adblocker.
 
-Useful for when a family member needs to quickly make an order from a retailer that pins their site functionality on 3rd-party services that threaten your ambient privacy online. (I'm looking at you Lowes, Macy's, JCPenney, CVS, Target, etc) 
+Useful for when a family member needs to quickly make an order from a retailer that pins their site functionality on 3rd-party services that threaten your ambient privacy online. (I'm looking at you Lowes, Macy's, JCPenney, & CVS) 
 
-Intended for use in combination with Docker and a reverse proxy such a [Traefik](https://docs.traefik.io/) or [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy).
+Intended for use in combination with Docker and a reverse proxy such as [Traefik](https://docs.traefik.io/) or [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy).
 
 ![UI Interaction](https://thumbs.gfycat.com/AridEasyBoa-small.gif)
 
@@ -32,8 +32,8 @@ $ adblock-control
 Once running, go to localhost:port and check it out!
 
 ## Notes 
-* Flags override env variables at runtime.
-* Port is an optional setting, if not speficied via flag or env it will default to 8080.
+* Flags supersede env variables at runtime.
+* Port is an optional setting, if not specified via flag or env it will default to 8080.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
