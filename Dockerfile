@@ -1,6 +1,6 @@
 FROM golang:1.14-alpine AS builder
 
-RUN apk update && apk add --no-cache git=2.27.0-r0 ca-certificates=20191127-r4 tzdata=2020a-r0 && update-ca-certificates
+RUN apk update && apk add --no-cache git ca-certificates=20191127-r4 tzdata=2020a-r0 && update-ca-certificates
 
 # Create unpriv user to run bot
 RUN adduser -D -g '' app
