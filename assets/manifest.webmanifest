@@ -1,0 +1,14 @@
+{
+  "short_name": "Adblock Control",
+  "name": "Adblock Control",
+  "icons": [{
+    "src": "/icon.png",
+    "type": "image/png",
+    "sizes": "192x192"
+  }],
+  "start_url": ".",
+  "background_color": "#1E88E5",
+  "theme_color": "#1E88E5",
+  "display": "standalone",
+  "description": "A simple UI to temporarily disable a pi-hole adblocker."
+}
