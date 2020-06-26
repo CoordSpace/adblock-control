@@ -10,4 +10,6 @@
     ],
     "background_color": "#1E88E5",
     "theme_color": "#1E88E5",
+    "start_url": "/",
+    "display": "minimal-ui"
 }
