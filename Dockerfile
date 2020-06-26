@@ -2,23 +2,19 @@ FROM golang:1.14-alpine AS builder
 
 # Create unpriv user to run bot
 RUN adduser -D -g '' app
-
 WORKDIR /app/src/adblock-control
-
 COPY . .
-
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -a -installsuffix cgo -o /go/bin/adblock-control .
+# Compile the static binary
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -a -installsuffix cgo .
 
 FROM scratch
-
-LABEL maintainer="CoordSpace"
-LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-
+LABEL maintainer="CoordSpace - http://coord.space"
+# Without this, the binary can't find the template
+WORKDIR /app
 COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /go/bin/adblock-control /go/bin/adblock-control
+# Copy over the compiled binary
+COPY --from=builder /app/src/adblock-control/adblock-control /app/src/adblock-control/index.html ./
 # Copy over all the templates and icons
-RUN mkdir /go/bin/adblock-control/assets
-COPY --from=builder /app/src/adblock-control/assets/* /go/bin/adblock-control/assets/
+COPY --from=builder /app/src/adblock-control/assets/* ./assets/
 USER app
-
-CMD ["/go/bin/adblock-control"]
+CMD ["/app/adblock-control"]

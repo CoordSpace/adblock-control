@@ -31,6 +31,14 @@ $ adblock-control
 
 Once running, go to localhost:port and check it out!
 
+### Docker
+
+A prebuild image is already available and can be run via
+
+```bash
+$ docker run --rm -p 8080:8080 -e API_KEY=xxxxxyyyyyzzzzz -e URL='http://pi.hole/admin' coordspace/adblock-control:latest
+```
+
 ## Notes 
 * Flags supersede env variables at runtime.
 * Port is an optional setting, if not specified via flag or env it will default to 8080.
