@@ -1,8 +1,10 @@
 <!doctype html>
-<html class="no-js" lang="">
+<html>
     <head>
         <meta charset="utf-8">
         <title>Adblock Control</title>
+        <!-- FOUC Fix -->
+        <style>html{visibility: hidden;opacity:0;}</style>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.0/css/bulma.min.css" integrity="sha256-aPeK/N8IHpHsvPBCf49iVKMdusfobKo2oxF8lRruWJg=" crossorigin="anonymous" />
         <meta name="theme-color" content="#8ce4f2">
         <meta name="description" content="A simple control for a locally hosted Pi-Hole.">
@@ -68,5 +70,6 @@
                 </div>
             </div>
         </section>
+        <link rel="stylesheet" href="/assets/main.css">
     </body>
 </html>

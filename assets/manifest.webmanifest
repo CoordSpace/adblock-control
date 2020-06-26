@@ -1,6 +1,6 @@
 {
-  "short_name": "Adblock Control",
-  "name": "Adblock Control",
+  "short_name": "Adblock Off",
+  "name": "Adblock Off",
   "icons": [{
     "src": "/icon.png",
     "type": "image/png",
