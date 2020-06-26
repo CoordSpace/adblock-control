@@ -1,6 +1,6 @@
 {
-    "name": "",
-    "short_name": "",
+    "short_name": "Adblock Off",
+    "name": "Adblock Off",
     "icons": [
         {
             "src": "/assets/android-chrome-192x192.png",
@@ -8,7 +8,6 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
-    "display": "standalone"
+    "background_color": "#1E88E5",
+    "theme_color": "#1E88E5",
 }
