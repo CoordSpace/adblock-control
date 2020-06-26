@@ -101,11 +101,11 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+
 	// import all our page assets
 	fs := http.FileServer(http.Dir("assets"))
 	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
-
 	mux.HandleFunc("/disable", disableHandler)
 	mux.HandleFunc("/", indexHandler)
-	http.ListenAndServe(":"+(*port), mux)
+	http.ListenAndServe("0.0.0.0:"+(*port), mux)
 }
