@@ -82,7 +82,7 @@ func disableHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	authRequestURL := fmt.Sprintf("%s/auth", *piHoleURL)
+	authRequestURL := fmt.Sprintf("%s/api/auth", *piHoleURL)
 
 	req, err := http.NewRequest("POST", authRequestURL, bytes.NewBuffer(message_data))
 	req.Header.Set("Content-Type", "application/json")
@@ -126,7 +126,7 @@ func disableHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Disable the adblock
-	dnsRequestURL := fmt.Sprintf("%s/dns/blocking", *piHoleURL)
+	dnsRequestURL := fmt.Sprintf("%s/api/dns/blocking", *piHoleURL)
 
 	dns := DNS{Blocking: false, Timer: duration, SID: s.Session.SID}
 
