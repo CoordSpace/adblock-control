@@ -5,13 +5,11 @@
         <title>Adblock Control</title>
         <!-- FOUC Fix -->
         <style>html{visibility: hidden;opacity:0;}</style>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.0/css/bulma.min.css" integrity="sha256-aPeK/N8IHpHsvPBCf49iVKMdusfobKo2oxF8lRruWJg=" crossorigin="anonymous" />
         <meta name="theme-color" content="#8ce4f2">
         <meta name="description" content="A simple UI for temporarily disabling a Pi-Hole adblocker.">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta property="og:title" content="Adblock Control">
         <meta property="og:type" content="website">
-        <meta property="og:url" content="adblock.earley.ml">
         <meta property="og:image" content="/assets/icon.png">
         <link rel="apple-touch-icon" href="/assets/icon.png">
         <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
@@ -22,6 +20,8 @@
         <link rel="shortcut icon" href="/assets/favicon.ico">
         <meta name="msapplication-TileColor" content="#b91d47">
         <meta name="msapplication-config" content="/assets/browserconfig.xml">
+        <link rel="stylesheet" href="/assets/bulma.min.css">
+        <link rel="stylesheet" href="/assets/main.css">
     </head>
     <body>
         <!-- Add your site or application content here -->
@@ -29,26 +29,33 @@
             <div class="hero-body">
                 <div class="container has-text-centered">
                     <figure class="image container is-128x128">
-                        <img src="/assets/icon.png">
+                        <picture>
+                            <source srcset="/assets/icon.webp" type="image/webp">
+                            <img src="/assets/icon.png">
+                        </picture>    
                     </figure>
                     {{ if . }}
                     <h1 class="title">
-                        Adblock is now {{.Status}} for {{.Duration}} minutes.
+                        {{ if .Blocking }}
+                        Pi-hole adblock is NOT disabled! <br> Please report this issue to your PiHole owner.
+                        {{ else }}
+                        Pi-hole adblock is now disabled for {{ .Timer }} minutes.
+                        {{ end }}
                     </h1>
                     <h2 class="subtitle">
                         You can now close this page.
                     </h2>
                     {{ else }}
                     <h1 class="title">
-                        Disable Adblock
+                        Disable Pi-hole adblock
                     </h1>
                     <h2 class="subtitle">
-                        Because the 'net is weird.
+                        Because the 'net is a mess.
                     </h2>
                     <form action="/disable" method="GET">
-                        <div class="field">
+                        <div class="field mt-4">
                             <div class="control">
-                                <button id="button" class="button is-primary is-large">
+                                <button id="button" class="button is-danger is-dark is-large is-rounded">
                                     Disable Adblock
                                 </button>
                             </div>
@@ -69,6 +76,5 @@
                 </div>
             </div>
         </section>
-        <link rel="stylesheet" href="/assets/main.css">
     </body>
 </html>

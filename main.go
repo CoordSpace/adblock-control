@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -14,74 +17,177 @@ import (
 
 var tpl = template.Must(template.ParseFiles("index.html"))
 
-var apiKey *string
+var app_pass *string
 var piHoleURL *string
+
+type Login struct {
+	Password string `json:"password"`
+}
+
+type DNS struct {
+	Blocking bool   `json:"blocking"`
+	Timer    int    `json:"timer"`
+	SID      string `json:"sid"`
+	Took     int    `json:"took"`
+}
+
+type Session struct {
+	Valid    bool   `json:"valid"`
+	TOTP     bool   `json:"totp"`
+	SID      string `json:"sid"`
+	CSRF     string `json:"csrf"`
+	Validity int    `json:"validity"`
+	Message  string `json:"message"`
+}
+
+type SessionWrapper struct {
+	Session Session `json:"session"`
+	Took    float32 `json:"took"`
+}
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tpl.Execute(w, nil)
 }
 
-// State is the contents of the newsAPI response data
-type State struct {
-	Status   string `json:"status"`
-	Duration int    `json:"duration"`
-}
-
 func disableHandler(w http.ResponseWriter, r *http.Request) {
+
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Internal server error"))
 		return
 	}
+	// parse duration param from the site form
 	params := u.Query()
-	duration := params.Get("duration")
-	endpoint := fmt.Sprintf("%s/api.php?disable=%s&auth=%s", *piHoleURL, duration, *apiKey)
 
-	fmt.Println(endpoint)
+	// Create the client we'll be using for all the pihole connections
+	// pihole default config generates a self-signed cert, so disable verify
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
 
-	resp, err := http.Get(endpoint)
+	// Get the SID
+	login := &Login{Password: *app_pass}
+
+	fmt.Printf("Login: %+v\n", login)
+
+	message_data, err := json.Marshal(login)
+
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		println("Error marshalling json data!")
+		log.Fatal(err)
 	}
 
-	defer resp.Body.Close()
+	authRequestURL := fmt.Sprintf("%s/auth", *piHoleURL)
 
-	state := &State{}
+	fmt.Printf("Pihole Auth URL: %s, App Pass: %s\n", authRequestURL, *app_pass)
 
-	err = json.NewDecoder(resp.Body).Decode(&state)
+	req, err := http.NewRequest("POST", authRequestURL, bytes.NewBuffer(message_data))
+	req.Header.Set("Content-Type", "application/json")
+
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		println("Error creating POST request!")
+		log.Fatal(err)
 	}
 
-	minutes, err := strconv.Atoi(duration)
-
+	resp, err := client.Do(req)
 	if err != nil {
-		http.Error(w, "Unexpected server error", http.StatusInternalServerError)
-		return
+		println("Error sending auth POST to pihole!")
+		log.Fatal(err)
 	}
 
-	state.Duration = minutes / 60
+	fmt.Printf("Server response code: %d", resp.StatusCode)
 
-	err = tpl.Execute(w, state)
+	var s SessionWrapper
+	// convert from http response reader to bytes
+	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		log.Println(err)
+		println("Error parsing auth response from pihole!")
+		log.Fatal(err)
+	}
+
+	println(string(body))
+
+	// sid is now in session.SID
+	err = json.Unmarshal(body, &s)
+
+	if err != nil {
+		println("Error converting auth response from pihole to JSON!")
+		log.Fatal(err)
+	}
+
+	fmt.Printf("Session: %+v\n", s)
+
+	if s.Session.Valid == false {
+		log.Fatal("Error getting valid session from API!")
+	}
+
+	duration, err := strconv.Atoi(params.Get("duration"))
+
+	if err != nil {
+		println("Error converting duration to int!")
+		log.Fatal(err)
+	}
+
+	// Disable the adblock
+	dnsRequestURL := fmt.Sprintf("%s/dns/blocking", *piHoleURL)
+
+	dns := DNS{Blocking: false, Timer: duration, SID: s.Session.SID}
+
+	dns_data, err := json.Marshal(dns)
+
+	if err != nil {
+		println("Error marshalling json data!")
+		log.Fatal(err)
+	}
+
+	req, err = http.NewRequest("POST", dnsRequestURL, bytes.NewBuffer(dns_data))
+	req.Header.Set("Content-Type", "application/json")
+
+	if err != nil {
+		println("Error creating POST request!")
+		log.Fatal(err)
+	}
+
+	resp, err = client.Do(req)
+	if err != nil {
+		println("Error sending dns POST to pihole!")
+		log.Fatal(err)
+	}
+
+	var dns_result DNS
+
+	body, err = io.ReadAll(resp.Body)
+
+	// convert the reply from pihole into a DNS status struct
+	err = json.Unmarshal(body, &dns_result)
+
+	fmt.Printf("DNS Status info - Blocking: %t, Duration: %d", dns_result.Blocking, dns_result.Timer)
+
+	// convert to minutes for easier reading on the result page
+	dns_result.Timer = dns_result.Timer / 60
+
+	// print out information from the ack body
+	err = tpl.Execute(w, dns_result)
+
+	if err != nil {
+		println("Error executing the DNS result to the page!")
+		log.Fatal(err)
 	}
 }
 
 func main() {
-	// Get the URL, port, and API key from the command args if given
-	apiKey = flag.String("apikey", "", "Pi-Hole API key.")
+	// Get the URL, port, and API key from the command args, if given.
+	app_pass = flag.String("app_pass", "", "Pi-Hole API app password.")
 	piHoleURL = flag.String("url", "", "URL to the Pi-Hole Admin UI.")
 	port := flag.String("port", "", "The port of the Adblock Control UI")
 	flag.Parse()
 
 	// Parse ENV variables if flags were not set.
-	if *apiKey == "" {
-		*apiKey = os.Getenv("API_KEY")
+	if *app_pass == "" {
+		*app_pass = os.Getenv("APP_PASS")
 	}
 
 	if *piHoleURL == "" {
@@ -90,14 +196,14 @@ func main() {
 
 	if *port == "" {
 		*port = os.Getenv("PORT")
-		// Default to 8080 if nothing is set
+		// Default the app's port to 8080 if nothing is set
 		if *port == "" {
 			*port = "8080"
 		}
 	}
 
-	if *apiKey == "" || *piHoleURL == "" {
-		log.Fatal("apiKey and url must be set via flag or ENV")
+	if *app_pass == "" || *piHoleURL == "" {
+		log.Fatal("app_pass and url must be set via flag or ENV")
 	}
 
 	mux := http.NewServeMux()

@@ -1,8 +1,8 @@
-# Adblock Control
+# Pi-hole Adblock Control
 
-A simple golang webapp for temporarily disabling a self-hosted instance of the [Pi-Hole](https://pi-hole.net/) adblocker.
+A simple golang webapp for temporarily disabling a self-hosted instance of the [Pi-hole V6.0+](https://pi-hole.net/) adblocker.
 
-Useful for when a family member needs to quickly make an order from a retailer that pins their site functionality on 3rd-party services that threaten your ambient privacy online. (I'm looking at you Lowes, Macy's, JCPenney, & CVS) 
+Useful for when a family member needs to quickly make an order from a retailer that pins their site functionality on 3rd-party services that threaten your ambient privacy online and/or also spread malware. (I'm looking at you Lowes, Macy's, JCPenney, & CVS)
 
 Intended for use in combination with Docker and a reverse proxy such as [Traefik](https://docs.traefik.io/) or [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy).
 
@@ -16,15 +16,18 @@ $ go get github.com/CoordSpace/adblock-control
 
 ## Usage
 
+> [!IMPORTANT]
+> Due to [authentication changes](https://docs.pi-hole.net/api/auth/) as part of the Pi-hole V6 update, you will need to generate an app password in the web interface on the settings page.
+
 You can specify the apikey, url, and port with flags.
 ```bash
-$ adblock-control -apikey=XXYYZZ -url='http://pi.hole/admin' -port=9000
+$ adblock-control -app_pass=XXYYZZ -url='https://pi.hole/admin' -port=9000
 ```
 
 Or with environment variables (Useful for configuring a Docker container)
 ```bash
-$ export API_KEY="XXYYZZ"
-$ export URL="http://pi.hole/admin"
+$ export APP_PASS="XXYYZZ"
+$ export URL="https://pi.hole/admin"
 $ export PORT="9000"
 $ adblock-control
 ```
@@ -36,7 +39,7 @@ Once running, go to localhost:port and check it out!
 A prebuild image is already available and can be run via
 
 ```bash
-$ docker run --rm -p 8080:8080 -e API_KEY=xxxxxyyyyyzzzzz -e URL='http://pi.hole/admin' coordspace/adblock-control:latest
+$ docker run --rm -p 8080:8080 -e APP_PASS=xxxxxyyyyyzzzzz -e URL='https://pi.hole/admin' coordspace/adblock-control:latest
 ```
 
 ## Notes 
