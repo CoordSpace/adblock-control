@@ -1,4 +1,4 @@
-FROM golang:1.14-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 # Create unpriv user to run bot
 RUN adduser -D -g '' app
