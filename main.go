@@ -107,7 +107,6 @@ func disableHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	// sid is now in session.SID
 	err = json.Unmarshal(body, &s)
 
 	if err != nil {

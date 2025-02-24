@@ -11,6 +11,7 @@ FROM scratch
 LABEL maintainer="CoordSpace - http://coord.space"
 # Without this, the binary can't find the template
 WORKDIR /app
+# This enables using the non-root user
 COPY --from=builder /etc/passwd /etc/passwd
 # Copy over the compiled binary
 COPY --from=builder /app/src/adblock-control/adblock-control /app/src/adblock-control/index.html ./

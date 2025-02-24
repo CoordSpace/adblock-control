@@ -21,13 +21,13 @@ $ go get github.com/CoordSpace/adblock-control
 
 You can specify the apikey, url, and port with flags.
 ```bash
-$ adblock-control -app_pass=XXYYZZ -url='https://pi.hole/admin' -port=9000
+$ adblock-control -app_pass=XXYYZZ -url='https://pi.hole/api' -port=9000
 ```
 
 Or with environment variables (Useful for configuring a Docker container)
 ```bash
 $ export APP_PASS="XXYYZZ"
-$ export URL="https://pi.hole/admin"
+$ export URL="https://pi.hole/api"
 $ export PORT="9000"
 $ adblock-control
 ```
@@ -39,7 +39,7 @@ Once running, go to localhost:port and check it out!
 A prebuild image is already available and can be run via
 
 ```bash
-$ docker run --rm -p 8080:8080 -e APP_PASS=xxxxxyyyyyzzzzz -e URL='https://pi.hole/admin' coordspace/adblock-control:latest
+$ docker run --rm -p 8080:8080 -e APP_PASS=xxxxxyyyyyzzzzz -e URL='https://pi.hole/api' coordspace/adblock-control:latest
 ```
 
 ## Notes 
