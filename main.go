@@ -70,8 +70,6 @@ func disableHandler(w http.ResponseWriter, r *http.Request) {
 	// Get the SID
 	login := &Login{Password: *app_pass}
 
-	fmt.Printf("Login: %+v\n", login)
-
 	message_data, err := json.Marshal(login)
 
 	if err != nil {
@@ -80,8 +78,6 @@ func disableHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	authRequestURL := fmt.Sprintf("%s/auth", *piHoleURL)
-
-	fmt.Printf("Pihole Auth URL: %s, App Pass: %s\n", authRequestURL, *app_pass)
 
 	req, err := http.NewRequest("POST", authRequestURL, bytes.NewBuffer(message_data))
 	req.Header.Set("Content-Type", "application/json")
@@ -97,8 +93,6 @@ func disableHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Server response code: %d", resp.StatusCode)
-
 	var s SessionWrapper
 	// convert from http response reader to bytes
 	body, err := io.ReadAll(resp.Body)
@@ -108,8 +102,6 @@ func disableHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	println(string(body))
-
 	// sid is now in session.SID
 	err = json.Unmarshal(body, &s)
 
@@ -118,9 +110,7 @@ func disableHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Session: %+v\n", s)
-
-	if s.Session.Valid == false {
+	if !s.Session.Valid {
 		log.Fatal("Error getting valid session from API!")
 	}
 
@@ -161,10 +151,18 @@ func disableHandler(w http.ResponseWriter, r *http.Request) {
 
 	body, err = io.ReadAll(resp.Body)
 
+	if err != nil {
+		println("Error reading response body!")
+		log.Fatal(err)
+	}
+
 	// convert the reply from pihole into a DNS status struct
 	err = json.Unmarshal(body, &dns_result)
 
-	fmt.Printf("DNS Status info - Blocking: %t, Duration: %d", dns_result.Blocking, dns_result.Timer)
+	if err != nil {
+		println("Error parsing DNS JSON from Pi-hole!")
+		log.Fatal(err)
+	}
 
 	// convert to minutes for easier reading on the result page
 	dns_result.Timer = dns_result.Timer / 60
