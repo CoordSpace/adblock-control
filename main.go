@@ -28,7 +28,12 @@ type DNS struct {
 	Blocking bool   `json:"blocking"`
 	Timer    int    `json:"timer"`
 	SID      string `json:"sid"`
-	Took     int    `json:"took"`
+}
+
+type DNSReply struct {
+	Blocking string  `json:"blocking"`
+	Timer    int     `json:"timer"`
+	Took     float32 `json:"took"`
 }
 
 type Session struct {
@@ -147,7 +152,7 @@ func disableHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	var dns_result DNS
+	var dns_result DNSReply
 
 	body, err = io.ReadAll(resp.Body)
 

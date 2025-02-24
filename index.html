@@ -36,8 +36,8 @@
                     </figure>
                     {{ if . }}
                     <h1 class="title">
-                        {{ if .Blocking }}
-                        Pi-hole adblock is NOT disabled! <br> Please report this issue to your PiHole owner.
+                        {{ if eq .Blocking "enabled" }}
+                        Pi-hole adblock is NOT disabled! <br> Please report this issue to your Pi-hole owner.
                         {{ else }}
                         Pi-hole adblock is now disabled for {{ .Timer }} minutes.
                         {{ end }}
